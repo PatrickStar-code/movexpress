@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 
 export default function ThemeToggleButton() {
-  const [theme, setTheme] = useState("light"); // Definir tema inicial
+  const [theme, setTheme] = useState("light");
 
   // Aguardar a montagem do componente
   useEffect(() => {
