@@ -10,7 +10,7 @@ export default function ClientLayout({
   return (
     <>
       <Navbar />
-      <ScrollProgress className="fixed top-[65px]" />
+      <ScrollProgress className="fixed top-[px]" />
       {children}
     </>
   );

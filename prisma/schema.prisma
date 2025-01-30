@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  
+}
+
+enum TipoUsuario {
+  ADMINISTRADOR
+  ENTREGADOR
+  CLIENTE
+}
+
+model Usuario {
+  id               Int          @id @default(autoincrement())
+  nome_usuario     String
+  cpf_usuario      String       @unique
+  email_usuario    String       @unique
+  senha_usuario    String
+  telefone_usuario String
+  tipo_usuario     TipoUsuario @default(CLIENTE)
+  entregas         Entrega[]   @relation("EntregaUsuario") 
+}
+
+enum StatusCnh {
+  LIBERADO
+  VERIFICANDO
+  RECUSADO
+  PENDENTE
+}
+
+model Entregador {
+  id               Int          @id @default(autoincrement())
+  placa_veiculo    String?
+  status_cnh       StatusCnh
+  entregas         Entrega[]    @relation("EntregaEntregador")
+}
+
+enum StatusEntrega {
+  PENDENTE
+  ACEITO
+  ENVIADO
+  ENTREGUE
+}
+
+model Entrega {
+  id                  Int          @id @default(autoincrement())
+  desc_entrega        String
+  cep_origem_entrega  String
+  cep_destino_entrega String
+  valor_total         Float
+  status_entrega      StatusEntrega
+  data_entrega        DateTime     @default(now())
+  entregadorId           Int
+  usuarioId           Int?
+
+  entregador             Entregador   @relation("EntregaEntregador", fields: [entregadorId], references: [id])
+  usuario             Usuario?     @relation("EntregaUsuario", fields: [usuarioId], references: [id])
+}
+
+model PrecoKm {
+  id     Int     @id @default(autoincrement())
+  km_min Float
+  km_max Float
+  valor  Float
+}
+
+model PrecoPeso {
+  id        Int     @id @default(autoincrement())
+  peso_min  Float
+  peso_max  Float
+  valor     Float
+}
+
+model PrecoTempo {
+  id         Int     @id @default(autoincrement())
+  tempo_min  Int
+  tempo_max  Int
+  valor      Float
+}

@@ -1,10 +1,18 @@
+"use client";
 import React from "react";
+import { motion } from "framer-motion";
 import { Container } from "./Container";
 
 export const Cta = () => {
   return (
     <Container>
-      <div className="flex flex-wrap items-center justify-between w-full max-w-4xl gap-5 mx-auto text-white bg-indigo-600 px-7 py-7 lg:px-12 lg:py-12 lg:flex-nowrap rounded-xl">
+      <motion.div
+        className="flex flex-wrap items-center justify-between w-full max-w-4xl gap-5 mx-auto text-white bg-indigo-600 px-7 py-7 lg:px-12 lg:py-12 lg:flex-nowrap rounded-xl"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.6, ease: "easeInOut" }}
+      >
         <div className="flex-grow text-center lg:text-left">
           <h2 className="text-2xl font-medium lg:text-3xl">
             Ready to try-out this template?
@@ -23,7 +31,7 @@ export const Cta = () => {
             Download for Free
           </a>
         </div>
-      </div>
+      </motion.div>
     </Container>
   );
 };

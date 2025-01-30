@@ -29,14 +29,14 @@ export default function ThemeToggleButton() {
       className="h-12 w-12 rounded-lg p-2 fixed right-4 bottom-4 transition-all duration-300 ease-in-out transform hover:scale-110 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-lg hover:shadow-2xl"
     >
       <svg
-        className="fill-violet-700 block dark:hidden transition-all duration-300 ease-in-out"
+        className="fill-blue-700 hidden dark:block transition-all duration-300 ease-in-out"
         fill="currentColor"
         viewBox="0 0 20 20"
       >
         <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
       </svg>
       <svg
-        className="fill-yellow-500 hidden dark:block transition-all duration-300 ease-in-out"
+        className="fill-yellow-500 block dark:hidden transition-all duration-300 ease-in-out"
         fill="currentColor"
         viewBox="0 0 20 20"
       >

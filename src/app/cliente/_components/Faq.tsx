@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 
 import { Container } from "./Container";
 import {
@@ -41,9 +42,21 @@ export const Faq = () => {
               <AccordionTrigger className="dark:text-white">
                 {item.question}
               </AccordionTrigger>
-              <AccordionContent className="dark:text-white  dark:bg-[#0C0A09]">
-                {item.answer}
-              </AccordionContent>
+              <motion.div
+                className="overflow-hidden"
+                initial="collapsed"
+                animate="expanded"
+                exit="collapsed"
+                variants={{
+                  collapsed: { height: 0, opacity: 0 },
+                  expanded: { height: "auto", opacity: 1 },
+                }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+              >
+                <AccordionContent className="dark:text-white dark:bg-[#0C0A09]">
+                  {item.answer}
+                </AccordionContent>
+              </motion.div>
             </AccordionItem>
           ))}
         </Accordion>
