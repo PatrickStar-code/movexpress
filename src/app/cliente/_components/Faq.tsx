@@ -14,22 +14,24 @@ import {
 export const Faq = () => {
   const faqdata = [
     {
-      question: "Is this template completely free to use?",
-      answer: "Yes, this template is completely free to use.",
-    },
-    {
-      question: "Can I use it in a commercial project?",
-      answer: "Yes, this you can.",
-    },
-    {
-      question: "What is your refund policy?",
+      question: "Como funciona o processo de entrega na MoveXpress?",
       answer:
-        "If you're unhappy with your purchase for any reason, email us within 90 days and we'll refund you in full, no questions asked.",
+        "Você solicita uma coleta e um entregador disponível pega sua encomenda no local indicado, levando até o destino solicitado. O processo é simples e rápido.",
     },
     {
-      question: "Do you offer technical support?",
+      question: "Preciso pagar taxas extras?",
       answer:
-        "No, we don't offer technical support for free downloads. Please purchase a support plan to get 6 months of support.",
+        "Não, na MoveXpress não há taxas extras ocultas. Você paga apenas pelo valor do serviço de entrega com base na distância e tempo estimado.",
+    },
+    {
+      question: "Como me torno um entregador da MoveXpress?",
+      answer:
+        "Basta se cadastrar em nossa plataforma, fornecer suas informações e escolher sua disponibilidade. A MoveXpress fará a conexão com clientes que precisam de entregas.",
+    },
+    {
+      question: "Posso agendar uma entrega com antecedência?",
+      answer:
+        "Sim, você pode agendar suas entregas com antecedência para garantir que o entregador esteja disponível no momento desejado.",
     },
   ];
 

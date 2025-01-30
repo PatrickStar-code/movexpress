@@ -17,35 +17,37 @@ export default function ClientPage() {
       <Container>
         <Hero />
         <SectionTitle
-          preTitle="Nextly Benefits"
-          title=" Why should you use this landing page"
+          preTitle="Vantagens da MoveXpress"
+          title="Por que escolher a nossa plataforma?"
         >
-          Nextly is a free landing page & marketing website template for
-          startups and indie projects. Its built with Next.js & TailwindCSS. And
-          its completely open-source.
+          A MoveXpress conecta você a entregadores de forma rápida e segura.
+          Solicite coletas e entregas com facilidade, acompanhando tudo em tempo
+          real.
         </SectionTitle>
         <Benefits data={benefitOne} />
         <Benefits imgPos="right" data={benefitTwo} />
         <SectionTitle
-          preTitle="Watch a video"
-          title="Learn how to fullfil your needs"
+          preTitle="Assista ao vídeo"
+          title="Veja como é fácil enviar e receber entregas"
         >
-          This section is to highlight a promo or demo video of your product.
-          Analysts says a landing page with video has 3% more conversion rate.
-          So, don&apos;t forget to add one. Just like this.
+          Descubra como a MoveXpress pode tornar suas entregas mais rápidas e
+          seguras. No vídeo, mostramos como solicitar um entregador, acompanhar
+          sua encomenda e aproveitar todos os benefícios da nossa plataforma.
         </SectionTitle>
         <VideoPlayer videoId="0O2aHWkGhG4" />
         <SectionTitle
-          preTitle="Testimonials"
-          title="Here's what our customers said"
+          preTitle="Depoimentos"
+          title="Veja o que nossos clientes estão dizendo"
         >
-          Testimonials is a great way to increase the brand trust and awareness.
-          Use this section to highlight your popular customers.
+          Depoimentos são uma excelente maneira de aumentar a confiança e a
+          visibilidade da sua marca. Use esta seção para destacar a experiência
+          positiva de nossos clientes com a MoveXpress.
         </SectionTitle>
         <Testimonials />
-        <SectionTitle preTitle="FAQ" title="Frequently Asked Questions">
-          Answer your customers possible questions here, it will increase the
-          conversion rate as well as support or chat requests.
+        <SectionTitle preTitle="FAQ" title="Perguntas Frequentes">
+          Aqui você encontra as respostas para as dúvidas mais comuns sobre
+          nossos serviços. Estamos aqui para garantir que sua experiência com a
+          MoveXpress seja simples e sem preocupações.
         </SectionTitle>
         <Faq />
         <Cta />{" "}

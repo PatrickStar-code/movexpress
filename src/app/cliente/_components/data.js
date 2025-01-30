@@ -1,57 +1,57 @@
 import {
-  FaceSmileIcon,
-  ChartBarSquareIcon,
-  CursorArrowRaysIcon,
-  DevicePhoneMobileIcon,
-  AdjustmentsHorizontalIcon,
-  SunIcon,
+  MapPinIcon,
+  RocketLaunchIcon,
+  UserGroupIcon,
+  TruckIcon,
+  ClockIcon,
+  ShieldCheckIcon,
 } from "@heroicons/react/24/solid";
 
 import benefitOneImg from "../../../../public/img/benefit-one.png";
 import benefitTwoImg from "../../../../public/img/benefit-two.png";
 
 export const benefitOne = {
-  title: "Highlight your benefits",
-  desc: "You can use this space to highlight your first benefit or a feature of your product. It can also contain an image or Illustration like in the example along with some bullet points.",
+  title: "Por que escolher a MoveXpress?",
+  desc: "A MoveXpress facilita entregas rápidas e seguras, conectando você a entregadores disponíveis. Tenha total controle e transparência no envio de suas encomendas.",
   image: benefitOneImg,
   bullets: [
     {
-      title: "Understand your customers",
-      desc: "Then explain the first point breifly in one or two lines.",
-      icon: <FaceSmileIcon />,
+      title: "Facilidade e praticidade",
+      desc: "Solicite entregas com poucos cliques e acompanhe o status em tempo real.",
+      icon: <MapPinIcon />, // Ícone de localização para representar rastreamento
     },
     {
-      title: "Improve acquisition",
-      desc: "Here you can add the next benefit point.",
-      icon: <ChartBarSquareIcon />,
+      title: "Entrega rápida e segura",
+      desc: "Nossos entregadores seguem as melhores rotas para garantir agilidade e segurança.",
+      icon: <RocketLaunchIcon />, // Ícone de foguete para simbolizar rapidez
     },
     {
-      title: "Drive customer retention",
-      desc: "This will be your last bullet point in this section.",
-      icon: <CursorArrowRaysIcon />,
+      title: "Conecte-se a entregadores confiáveis",
+      desc: "Escolha entre diversos entregadores e avalie suas experiências.",
+      icon: <UserGroupIcon />, // Ícone de grupo para representar entregadores confiáveis
     },
   ],
 };
 
 export const benefitTwo = {
-  title: "Offer more benefits here",
-  desc: "You can use this same layout with a flip image to highlight your rest of the benefits of your product. It can also contain an image or Illustration as above section along with some bullet points.",
+  title: "Mais vantagens para você",
+  desc: "Com a MoveXpress, você tem uma plataforma eficiente e intuitiva para solicitar entregas e acompanhar tudo em tempo real. Confira mais benefícios:",
   image: benefitTwoImg,
   bullets: [
     {
-      title: "Mobile Responsive Template",
-      desc: "Nextly is designed as a mobile first responsive template.",
-      icon: <DevicePhoneMobileIcon />,
+      title: "Entregas sob demanda",
+      desc: "Peça um entregador a qualquer momento e receba sua encomenda rapidamente.",
+      icon: <TruckIcon />,
     },
     {
-      title: "Powered by Next.js & TailwindCSS",
-      desc: "This template is powered by latest technologies and tools.",
-      icon: <AdjustmentsHorizontalIcon />,
+      title: "Acompanhe em tempo real",
+      desc: "Veja o status da sua entrega a qualquer momento pelo nosso app.",
+      icon: <ClockIcon />,
     },
     {
-      title: "Dark & Light Mode",
-      desc: "Nextly comes with a zero-config light & dark mode. ",
-      icon: <SunIcon />,
+      title: "Segurança garantida",
+      desc: "Trabalhamos com entregadores verificados para garantir sua tranquilidade.",
+      icon: <ShieldCheckIcon />,
     },
   ],
 };
