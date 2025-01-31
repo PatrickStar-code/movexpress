@@ -1,49 +1,52 @@
-"use server"
+"use server";
 
-import db from "@/lib/db"
-import { hashSync } from "bcrypt-ts"
-import { TipoUsuario } from "@prisma/client"
-import { redirect } from "next/navigation"
-import { UsuarioFormData } from "../_components/formRegister"
+import db from "@/lib/db";
+import { hashSync } from "bcrypt-ts";
+import { TipoUsuario } from "@prisma/client";
+import { redirect } from "next/navigation";
+import { UsuarioFormData } from "../_components/formRegister";
 
-export default async function register(formData: UsuarioFormData) {
-    console.log(formData)
-    const { cpf_usuario, email_usuario, nome_usuario, senha_usuario, telefone_usuario } = formData
+export default async function registerUser(formData: UsuarioFormData) {
+    console.log("Recebendo dados do formulário:", formData);
 
-    const telString = telefone_usuario.replace(/[^0-9]/g, '');
-    const cpfString = cpf_usuario.replace(/[^0-9]/g, '');
+    const { cpf_usuario, email_usuario, nome_usuario, senha_usuario, telefone_usuario } = formData;
 
+    const telString = telefone_usuario.replace(/\D/g, "");
+    const cpfString = cpf_usuario.replace(/\D/g, "");
 
-
+    // Verificar se já existe um usuário com o mesmo e-mail, CPF ou telefone
     const verifyUserExists = await db.usuario.findFirst({
-        where: { OR: [{ email_usuario }, { cpf_usuario: cpfString }, { telefone_usuario: telString }] },
-    })
+        where: {
+            OR: [
+                { email: email_usuario },
+                { cpf: cpfString },
+                { telefone: telString }
+            ],
+        },
+    });
 
     if (verifyUserExists) {
-        return 'User with email or phone already exists'
+        return { error: "Usuário com este e-mail, CPF ou telefone já existe" };
     }
 
     try {
         const user = await db.usuario.create({
             data: {
-                cpf_usuario: cpfString,
-                email_usuario,
-                nome_usuario,
-                senha_usuario: hashSync(senha_usuario, 10),
-                telefone_usuario: telString,
-                tipo_usuario: TipoUsuario.CLIENTE
-            }
-        })
+                cpf: cpfString,
+                email: email_usuario,
+                nome: nome_usuario,
+                senha: hashSync(senha_usuario, 10),
+                telefone: telString,
+                tipo_usuario: TipoUsuario.CLIENTE,
+            },
+        });
 
-        return user
-        redirect('/cliente/')
+        console.log("Usuário criado com sucesso:", user);
+
+        // Redireciona para a página de cliente após o cadastro
+        redirect("/cliente/");
     } catch (error) {
-        console.error(error)
-        return 'Error creating user'
-
+        console.error("Erro ao criar usuário:", error);
+        return { error: "Erro ao criar usuário. Tente novamente." };
     }
-
-
-
-
 }

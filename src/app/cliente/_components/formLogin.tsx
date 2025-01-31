@@ -5,14 +5,24 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/app/_components/ui/button";
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phoneRegex = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
+const cpfRegex = /^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/;
+
 // Definindo o schema de validação com Zod
 const loginSchema = z.object({
   login: z
     .string()
     .min(1, "Este campo é obrigatório")
-    .refine((value) => /^[A-Za-z0-9]+$/.test(value), {
-      message: "O login deve ser um email, telefone ou CPF válido",
-    }),
+    .refine(
+      (value) =>
+        emailRegex.test(value) ||
+        phoneRegex.test(value) ||
+        cpfRegex.test(value),
+      {
+        message: "O login deve ser um email, telefone ou CPF válido",
+      }
+    ),
   password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
 });
 

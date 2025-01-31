@@ -1,44 +1,28 @@
-generator client {
-  provider = "prisma-client-js"
-}
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-  
+  url   = env("DATABASE_URL")
 }
 
+generator client {
+  provider = "prisma-client-js"
+}
+// Enum para definir o tipo de usuário
 enum TipoUsuario {
-  ADMINISTRADOR
-  ENTREGADOR
+  ADMIN
   CLIENTE
+  ENTREGADOR
 }
 
-model Usuario {
-  id               Int          @id @default(autoincrement())
-  nome_usuario     String
-  cpf_usuario      String       @unique
-  email_usuario    String       @unique
-  senha_usuario    String
-  telefone_usuario String
-  tipo_usuario     TipoUsuario @default(CLIENTE)
-  entregas         Entrega[]   @relation("EntregaUsuario") 
-}
-
-enum StatusCnh {
+// Enum para status da CNH
+enum StatusCNH {
   LIBERADO
   VERIFICANDO
   RECUSADO
   PENDENTE
 }
 
-model Entregador {
-  id               Int          @id @default(autoincrement())
-  placa_veiculo    String?
-  status_cnh       StatusCnh
-  entregas         Entrega[]    @relation("EntregaEntregador")
-}
-
+// Enum para status da entrega
 enum StatusEntrega {
   PENDENTE
   ACEITO
@@ -46,38 +30,94 @@ enum StatusEntrega {
   ENTREGUE
 }
 
-model Entrega {
-  id                  Int          @id @default(autoincrement())
-  desc_entrega        String
-  cep_origem_entrega  String
-  cep_destino_entrega String
-  valor_total         Float
-  status_entrega      StatusEntrega
-  data_entrega        DateTime     @default(now())
-  entregadorId           Int
-  usuarioId           Int?
+// Tabela principal de usuários (Admin, Cliente e Entregador)
+model Usuario {
+  id           Int         @id @default(autoincrement())
+  nome         String
+  email        String      @unique
+  senha        String
+  telefone     String      @unique
+  cpf          String      @unique
+  cep          String?
+  foto         String?
+  tipo_usuario TipoUsuario
+  criacao      DateTime    @default(now())
+  
+  // Relacionamento: um usuário pode ter várias entregas
+  entregas     Entrega[]
 
-  entregador             Entregador   @relation("EntregaEntregador", fields: [entregadorId], references: [id])
-  usuario             Usuario?     @relation("EntregaUsuario", fields: [usuarioId], references: [id])
+  // Relacionamento com motoboy (caso o usuário seja um entregador)
+  Entregador      Entregador?
 }
 
+// Tabela de dados específicos para entregadores
+model Entregador {
+  id             Int       @id @default(autoincrement())
+  usuarioId      Int       @unique // Relacionado a um usuário
+  placa_moto     String
+  cnh            String
+  cnh_foto       String
+  conta_corrente String
+  agencia        String
+  status_cnh     StatusCNH @default(PENDENTE)
+
+  // Relacionamento com o usuário (ENTREGADOR)
+  usuario        Usuario   @relation(fields: [usuarioId], references: [id])
+
+  // Relacionamento com entregas
+  entregas       Entrega[]
+}
+
+// Tabela de entregas
+model Entrega {
+  id                  Int            @id @default(autoincrement())
+  descricao           String
+  peso               Float
+  complemento        String?
+  cep_origem         String
+  numero_origem      Int
+  bairro_origem      String?
+  logradouro_origem  String?
+  cep_destino        String
+  numero_destino     Int
+  bairro_destino     String
+  logradouro_destino String
+  distancia_km       String
+  tempo_transporte   String
+  tempo_minutos      Int
+  valor_total        Float
+  valor_70p          Float
+  data_pedido        DateTime       @default(now())
+  status_entrega     StatusEntrega  @default(PENDENTE)
+  assinado_por       String?
+  hora_inicio        DateTime?
+  hora_prevista      DateTime?
+
+  // Relacionamentos
+  entregadorId       Int?           // Referência ao entregador
+  usuarioId          Int?           // Referência ao cliente
+  entregador         Entregador?       @relation(fields: [entregadorId], references: [id])
+  usuario            Usuario?       @relation(fields: [usuarioId], references: [id])
+}
+
+// Tabela de preços por KM
 model PrecoKm {
-  id     Int     @id @default(autoincrement())
-  km_min Float
-  km_max Float
+  id     Int   @id @default(autoincrement())
+  km     Int
   valor  Float
 }
 
+// Tabela de preços por peso
 model PrecoPeso {
-  id        Int     @id @default(autoincrement())
-  peso_min  Float
-  peso_max  Float
-  valor     Float
+  id       Int   @id @default(autoincrement())
+  peso_min Float
+  peso_max Float
+  preco    Float
 }
 
+// Tabela de preços por tempo
 model PrecoTempo {
-  id         Int     @id @default(autoincrement())
-  tempo_min  Int
-  tempo_max  Int
-  valor      Float
+  id     Int   @id @default(autoincrement())
+  tempo  Int
+  valor  Float
 }
