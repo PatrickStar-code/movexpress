@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaClient } from "@prisma/client";
+import { compareSync } from "bcrypt-ts";
 
 const prisma = new PrismaClient();
 
@@ -14,31 +15,37 @@ export const {
         Credentials({
             name: "credentials",
             credentials: {
-                login: { label: "Email ou CPF", type: "text" },
+                login: { label: "Login", type: "text" },
                 password: { label: "Senha", type: "password" },
             },
             async authorize(credentials) {
                 if (!credentials?.login || !credentials?.password) {
-                    throw new Error("Email/CPF e senha são obrigatórios.");
+                    throw new Error("Login e senha são obrigatórios.");
                 }
 
-                // Buscar usuário pelo email ou CPF
                 const user = await prisma.usuario.findFirst({
                     where: {
-                        OR: [
-                            { email_usuario: credentials.login },
-                            { cpf_usuario: credentials.login },
-                        ],
+                        login: credentials.login,
                     },
                 });
 
                 if (!user) {
-                    throw new Error("Usuário não encontrado.");
+                    return null
                 }
 
-                // Verificar a senha (você pode usar bcrypt para comparar)
-                if (user.senha_usuario !== credentials.password) {
-                    throw new Error("Senha incorreta.");
+                // Verificar a senha 
+                const isPasswordCorrect = compareSync(
+                    credentials.password as string,
+                    user.senha ?? ""
+                );
+
+                console.log(credentials.password);
+                console.log(user.senha);
+
+                console.log(isPasswordCorrect);
+
+                if (!isPasswordCorrect) {
+                    return null;
                 }
 
                 // Definir o tipo de usuário
@@ -54,14 +61,14 @@ export const {
                 if (currentPath.includes("/cliente") && tipoUsuario !== "CLIENTE") {
                     throw new Error("Acesso negado: apenas clientes podem acessar esta página.");
                 }
-                if (currentPath.includes("/admin") && tipoUsuario !== "ADMINISTRADOR") {
+                if (currentPath.includes("/admin") && tipoUsuario !== "ADMIN") {
                     throw new Error("Acesso negado: apenas administradores podem acessar esta página.");
                 }
 
                 return {
                     id: user.id.toString(),
-                    nome: user.nome_usuario,
-                    email: user.email_usuario,
+                    nome: user.nome,
+                    email: user.email,
                     tipo_usuario: user.tipo_usuario,
                 };
             },
@@ -93,7 +100,6 @@ export const {
         },
     },
     pages: {
-        signIn: "/",
         signOut: "/logout",
     },
     secret: process.env.NEXTAUTH_SECRET,

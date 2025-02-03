@@ -9,7 +9,7 @@ import { UsuarioFormData } from "../_components/formRegister";
 export default async function registerUser(formData: UsuarioFormData) {
     console.log("Recebendo dados do formulário:", formData);
 
-    const { cpf_usuario, email_usuario, nome_usuario, senha_usuario, telefone_usuario } = formData;
+    const { cpf_usuario, email_usuario, nome_usuario, senha_usuario, telefone_usuario, login_usuario } = formData;
 
     const telString = telefone_usuario.replace(/\D/g, "");
     const cpfString = cpf_usuario.replace(/\D/g, "");
@@ -17,21 +17,24 @@ export default async function registerUser(formData: UsuarioFormData) {
     // Verificar se já existe um usuário com o mesmo e-mail, CPF ou telefone
     const verifyUserExists = await db.usuario.findFirst({
         where: {
+            login: login_usuario,
             OR: [
                 { email: email_usuario },
                 { cpf: cpfString },
-                { telefone: telString }
+                { telefone: telString },
             ],
         },
     });
 
     if (verifyUserExists) {
-        return { error: "Usuário com este e-mail, CPF ou telefone já existe" };
+        throw new Error("Usuário já cadastrado.");
+        return
     }
 
     try {
         const user = await db.usuario.create({
             data: {
+                login: login_usuario,
                 cpf: cpfString,
                 email: email_usuario,
                 nome: nome_usuario,
@@ -48,5 +51,7 @@ export default async function registerUser(formData: UsuarioFormData) {
     } catch (error) {
         console.error("Erro ao criar usuário:", error);
         return { error: "Erro ao criar usuário. Tente novamente." };
+        throw error;
+
     }
 }

@@ -4,42 +4,28 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/app/_components/ui/button";
-
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const phoneRegex = /^\(?\d{2}\)?\s?\d{4,5}-?\d{4}$/;
-const cpfRegex = /^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/;
+import LoginClient from "../_actions/login";
 
 // Definindo o schema de validação com Zod
 const loginSchema = z.object({
-  login: z
-    .string()
-    .min(1, "Este campo é obrigatório")
-    .refine(
-      (value) =>
-        emailRegex.test(value) ||
-        phoneRegex.test(value) ||
-        cpfRegex.test(value),
-      {
-        message: "O login deve ser um email, telefone ou CPF válido",
-      }
-    ),
+  login: z.string().min(6, "Este campo deve ter no mínimo 6 caracteres"),
   password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
 });
 
 // Tipagem para o formulário
-type FormData = z.infer<typeof loginSchema>;
+export type TFormDataLogin = z.infer<typeof loginSchema>;
 
 export default function FormLogin() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({
+  } = useForm<TFormDataLogin>({
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: FormData) => {
-    console.log(data);
+  const onSubmit = (data: TFormDataLogin) => {
+    LoginClient(data);
   };
 
   return (
@@ -49,7 +35,7 @@ export default function FormLogin() {
           htmlFor="login"
           className="block text-sm font-medium text-gray-700 dark:text-gray-300"
         >
-          Login (email, telefone ou CPF)
+          Login
         </label>
         <input
           id="login"

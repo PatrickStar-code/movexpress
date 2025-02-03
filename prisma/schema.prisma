@@ -34,12 +34,14 @@ enum StatusEntrega {
 model Usuario {
   id           Int         @id @default(autoincrement())
   nome         String
-  email        String      @unique
+  email        String      
   senha        String
-  telefone     String      @unique
-  cpf          String      @unique
+  telefone     String      
+  cpf          String      
   cep          String?
   foto         String?
+  login        String
+  
   tipo_usuario TipoUsuario
   criacao      DateTime    @default(now())
   

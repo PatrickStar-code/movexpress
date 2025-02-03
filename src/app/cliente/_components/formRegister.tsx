@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState } from "react";
 import { motion } from "framer-motion";
@@ -17,7 +18,7 @@ const usuarioSchema = z.object({
     .min(11, "CPF deve ter 11 dígitos")
     .max(14, "CPF inválido")
     .regex(/^\d{3}\.\d{3}\.\d{3}-\d{2}$|^\d{11}$/, "Formato inválido"),
-  login_usuario: z.string().min(1, "Login é obrigatório"),
+  login_usuario: z.string().min(6, "Login é obrigatório"),
   email_usuario: z.string().email("Email inválido"),
   telefone_usuario: z
     .string()
@@ -60,11 +61,12 @@ export default function FormRegister() {
         telefone_usuario: data.telefone_usuario.replace(/\D/g, ""),
       });
       toast.success("Cadastro realizado com sucesso!", { theme });
-      reset();
-    } catch (error) {
-      toast.error(error as string, { theme });
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message, { theme });
     } finally {
       setIsLoading(false);
+      reset();
     }
   }
 

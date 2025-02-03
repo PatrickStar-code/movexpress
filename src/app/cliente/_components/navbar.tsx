@@ -37,7 +37,6 @@ export default function Navbar() {
       {pathName === "/cliente" && (
         <>
           <nav className="flex items-center justify-between px-6 py-4 sticky top-0 bg-white dark:bg-[#0C0A09] z-50 shadow-md">
-            {/* Logo ou Nome - Centralizado */}
             <motion.div
               initial={{ x: -100, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
