@@ -39,10 +39,6 @@ export const {
                     user.senha ?? ""
                 );
 
-                console.log(credentials.password);
-                console.log(user.senha);
-
-                console.log(isPasswordCorrect);
 
                 if (!isPasswordCorrect) {
                     return null;

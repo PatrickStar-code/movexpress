@@ -131,7 +131,7 @@ export default function FormRegister() {
         {isLoading ? "Criando..." : "Criar conta"}
       </Button>
 
-      <p className="text-center text-gray-600 mt-6">
+      <p className="text-center text-gray-600 dark:text-gray-400 mt-6">
         Já tem uma conta?{" "}
         <Link
           href="/cliente"

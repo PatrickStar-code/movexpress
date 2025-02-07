@@ -1,10 +1,12 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/app/_components/ui/button";
 import LoginClient from "../_actions/login";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 
 // Definindo o schema de validação com Zod
 const loginSchema = z.object({
@@ -16,17 +18,35 @@ const loginSchema = z.object({
 export type TFormDataLogin = z.infer<typeof loginSchema>;
 
 export default function FormLogin() {
+  const [isLoading, setIsLoading] = useState(false);
+  const Router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<TFormDataLogin>({
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: TFormDataLogin) => {
-    LoginClient(data);
-  };
+  async function onSubmit(data: TFormDataLogin) {
+    const theme = document.documentElement.classList.contains("dark")
+      ? "dark"
+      : "light";
+    try {
+      setIsLoading(true);
+      await LoginClient(data);
+      toast.success("Login Realizado com sucesso!", { theme });
+      Router.refresh();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message, { theme });
+    } finally {
+      setIsLoading(false);
+      reset();
+    }
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -68,9 +88,10 @@ export default function FormLogin() {
       </div>
       <Button
         type="submit"
-        className="w-full py-3 px-4  text-white rounded-md  focus:outline-none "
+        className="w-full py-3 px-4  text-white rounded-md  focus:outline-none  disabled:bg-orange-400 disabled:cursor-not-allowed"
+        disabled={isLoading}
       >
-        Entrar
+        {isLoading ? "Entrando..." : "Entrar"}
       </Button>
     </form>
   );

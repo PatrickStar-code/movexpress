@@ -7,6 +7,7 @@ import {
   DialogTrigger,
 } from "@/app/_components/ui/dialog";
 import FormLogin from "./formLogin";
+import Link from "next/link";
 
 export default function DialogLogin({
   children,
@@ -25,6 +26,15 @@ export default function DialogLogin({
             Digite seu login e senha para acessar sua conta.
           </DialogDescription>
           <FormLogin />
+          <p className="text-center text-gray-600 dark:text-gray-400 mt-12">
+            Não tem uma conta?{" "}
+            <Link
+              href="/cliente/cadastro"
+              className="text-orange-600 hover:text-orange-700 font-medium underline underline-offset-4"
+            >
+              Crie uma agora
+            </Link>
+          </p>
         </DialogHeader>
       </DialogContent>
     </Dialog>

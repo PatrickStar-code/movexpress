@@ -1,4 +1,3 @@
-import React from "react";
 import { Hero } from "./_components/Hero";
 import { SectionTitle } from "./_components/SectionTitle";
 import { Benefits } from "./_components/Benefits";
@@ -10,12 +9,19 @@ import { benefitTwo } from "./_components/data";
 import { Faq } from "./_components/Faq";
 import { VideoPlayer } from "./_components/Video";
 import { Container } from "./_components/Container";
+import { auth } from "@/auth";
 
-export default function ClientPage() {
+export default async function ClientPage() {
+  const session = await auth();
+  let isLogged = false;
+  if (session) {
+    isLogged = true;
+  }
+
   return (
     <main className="bg-background overflow-x-hidden">
       <Container>
-        <Hero />
+        <Hero isLoged={isLogged} />
         <SectionTitle
           preTitle="Vantagens da MoveXpress"
           title="Por que escolher a nossa plataforma?"
@@ -50,7 +56,7 @@ export default function ClientPage() {
           MoveXpress seja simples e sem preocupações.
         </SectionTitle>
         <Faq />
-        <Cta />{" "}
+        <Cta isLoged={isLogged} />
       </Container>
     </main>
   );

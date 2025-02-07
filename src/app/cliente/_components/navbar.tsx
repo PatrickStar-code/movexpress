@@ -8,11 +8,22 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ScrollProgress } from "@/app/_components/ui/scroll-progress";
 import DialogLogin from "./DialogLogin";
+import ToggleAvatar from "./ToggleAvatar";
 
-export default function Navbar() {
+export type PropsUser = {
+  expires: string;
+  user: {
+    id: string;
+    email: string;
+    tipo_usuario: string;
+  };
+} | null;
+
+export default function Navbar({ session }: { session: PropsUser }) {
   const [theme, setTheme] = useState("light");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathName = usePathname();
+  console.log(session);
 
   useEffect(() => {
     const prefersDark = window.matchMedia(
@@ -34,7 +45,7 @@ export default function Navbar() {
 
   return (
     <>
-      {pathName === "/cliente" && (
+      {pathName !== "/cliente/cadastro" && (
         <>
           <nav className="flex items-center justify-between px-6 py-4 sticky top-0 bg-white dark:bg-[#0C0A09] z-50 shadow-md">
             <motion.div
@@ -63,18 +74,26 @@ export default function Navbar() {
                   <Sun className="text-yellow-500 w-6 h-6" />
                 )}
               </motion.button>
-              <Button
-                asChild
-                variant={"secondary"}
-                className="px-4 py-2 rounded-lg focus:outline-none"
-              >
-                <Link href="cliente/Register" replace>
-                  Registrar
-                </Link>
-              </Button>
-              <DialogLogin>
-                <Button className="px-4 py-2  focus:outline-none">Logar</Button>
-              </DialogLogin>
+              {session && session.user.tipo_usuario === "CLIENTE" ? (
+                <ToggleAvatar session={session} />
+              ) : (
+                <>
+                  <Button
+                    asChild
+                    variant={"secondary"}
+                    className="px-4 py-2 rounded-lg focus:outline-none"
+                  >
+                    <Link href="cliente/cadastro" replace>
+                      Registrar
+                    </Link>
+                  </Button>
+                  <DialogLogin>
+                    <Button className="px-4 py-2  focus:outline-none">
+                      Logar
+                    </Button>
+                  </DialogLogin>
+                </>
+              )}
             </div>
 
             {/* Menu para telas pequenas */}
@@ -93,45 +112,49 @@ export default function Navbar() {
                   <Sun className="text-yellow-500 w-6 h-6" />
                 )}
               </motion.button>
-              <button
-                className="text-gray-700 dark:text-gray-300 focus:outline-none"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              >
-                {/* Ícone de menu animado */}
-                <motion.svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                  initial="closed"
-                  animate={isMobileMenuOpen ? "open" : "closed"}
-                  variants={{
-                    closed: { rotate: 0, scale: 1 },
-                    open: { rotate: 90, scale: 1.2 },
-                  }}
-                  transition={{ duration: 0.3 }}
+              {session && session.user.tipo_usuario === "CLIENTE" ? (
+                <ToggleAvatar session={session} />
+              ) : (
+                <button
+                  className="text-gray-700 dark:text-gray-300 focus:outline-none"
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 >
-                  {isMobileMenuOpen ? (
-                    <motion.path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 18L18 6M6 6l12 12"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                    />
-                  ) : (
-                    <motion.path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3.75 12h16.5M3.75 6h16.5M3.75 18h16.5"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                    />
-                  )}
-                </motion.svg>
-              </button>
+                  {/* Ícone de menu animado */}
+                  <motion.svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                    initial="closed"
+                    animate={isMobileMenuOpen ? "open" : "closed"}
+                    variants={{
+                      closed: { rotate: 0, scale: 1 },
+                      open: { rotate: 90, scale: 1.2 },
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {isMobileMenuOpen ? (
+                      <motion.path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M6 18L18 6M6 6l12 12"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                      />
+                    ) : (
+                      <motion.path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M3.75 12h16.5M3.75 6h16.5M3.75 18h16.5"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                      />
+                    )}
+                  </motion.svg>
+                </button>
+              )}
 
               {/* Menu dropdown */}
               {isMobileMenuOpen && (
@@ -153,7 +176,7 @@ export default function Navbar() {
                       variant={"secondary"}
                       className="w-full px-4 py-2  rounded-lg focus:outline-none"
                     >
-                      <Link href="cliente/Register" replace>
+                      <Link href="cliente/cadastro" replace>
                         {" "}
                         Registrar{" "}
                       </Link>
