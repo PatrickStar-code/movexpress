@@ -1,9 +1,12 @@
-"use client";
-
 import * as React from "react";
 import { DataTableDemo } from "./data-table";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
-export default function DeliveryPage() {
+export default async function DeliveryPage() {
+  const session = await auth();
+  if (session?.user.tipo_usuario !== "Cliente" || !session)
+    redirect("/cliente");
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-background p-6">
       <div className="w-full max-w-5xl bg-card p-6 rounded-2xl shadow-lg">
