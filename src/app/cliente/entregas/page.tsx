@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 export default async function DeliveryPage() {
   const session = await auth();
-  if (session?.user.tipo_usuario !== "Cliente" || !session)
+  if (session?.user.tipo_usuario !== "CLIENTE" || !session)
     redirect("/cliente");
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-background p-6">

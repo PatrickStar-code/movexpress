@@ -53,9 +53,12 @@ export default function Navbar({ session }: { session: PropsUser }) {
               animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+              <Link
+                href="/cliente"
+                className="cursor-pointer text-xl font-bold text-gray-800 dark:text-gray-200"
+              >
                 Brand
-              </h1>
+              </Link>
             </motion.div>
 
             {/* Botões de Registrar e Logar */}
@@ -157,7 +160,7 @@ export default function Navbar({ session }: { session: PropsUser }) {
               )}
 
               {/* Menu dropdown */}
-              {isMobileMenuOpen && (
+              {isMobileMenuOpen && session?.user.tipo_usuario !== "CLIENTE" && (
                 <motion.ul
                   className="absolute top-16 left-0 w-full bg-gray-100 dark:bg-[#0C0A09]  shadow-md flex flex-col space-y-4 p-4"
                   initial={{ opacity: 0, y: -20 }}

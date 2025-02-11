@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Container } from "./Container";
 import HeroImg from "../../../../public/img/hero.png";
 import { Button } from "@/app/_components/ui/button";
+import DialogNewDelivery from "./DialogNewDelivery";
 
 export const Hero = ({ isLoged }: { isLoged: boolean }) => {
   const textVariants = {
@@ -43,11 +44,11 @@ export const Hero = ({ isLoged }: { isLoged: boolean }) => {
 
             <div className="flex flex-col items-start space-y-3 sm:space-x-4 sm:space-y-0 sm:items-center sm:flex-row">
               {isLoged ? (
-                <a href="/solicitar-entrega">
+                <DialogNewDelivery>
                   <Button className="px-8 py-4 p-8 text-lg font-medium text-center text-white rounded-md">
                     Solicitar Entrega
                   </Button>
-                </a>
+                </DialogNewDelivery>
               ) : (
                 <a href="cliente/cadastro">
                   <Button className="px-8 py-4 p-8 text-lg font-medium text-center text-white rounded-md">

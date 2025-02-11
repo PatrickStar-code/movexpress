@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import {
   ColumnDef,
@@ -17,6 +18,15 @@ import {
   ChevronDown,
   MoreHorizontal,
 } from "lucide-react";
+
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationLink,
+} from "@/app/_components/ui/pagination";
 
 import { Button } from "@/app/_components/ui/button";
 import {
@@ -267,7 +277,7 @@ export function DataTableDemo() {
                         <div
                           className={
                             header.column.getCanSort()
-                              ? "cursor-pointer select-none flex items-center space-x-1" // Ajustado para mais controle sobre o espaço entre o texto e o ícone
+                              ? "cursor-pointer select-none flex items-center space-x-1"
                               : ""
                           }
                           onClick={header.column.getToggleSortingHandler()}
@@ -278,14 +288,10 @@ export function DataTableDemo() {
                           )}
                           {{
                             asc: (
-                              <ArrowUpNarrowWide
-                                className="ml-2 h-4 w-4 text-gray-500 dark:text-gray-300" // Ajustado o tamanho do ícone
-                              />
+                              <ArrowUpNarrowWide className="ml-2 h-4 w-4 text-gray-500 dark:text-gray-300" />
                             ),
                             desc: (
-                              <ArrowDownNarrowWide
-                                className="ml-2 h-4 w-4 text-gray-500 dark:text-gray-300" // Ajustado o tamanho do ícone
-                              />
+                              <ArrowDownNarrowWide className="ml-2 h-4 w-4 text-gray-500 dark:text-gray-300" />
                             ),
                           }[header.column.getIsSorted() as string] ?? null}
                         </div>
@@ -311,6 +317,53 @@ export function DataTableDemo() {
             ))}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Paginação */}
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => {
+                  if (table.getCanPreviousPage()) {
+                    table.previousPage();
+                  }
+                }}
+                className={
+                  !table.getCanPreviousPage()
+                    ? "cursor-not-allowed opacity-50"
+                    : "cursor-pointer"
+                }
+              />
+            </PaginationItem>
+            {Array.from({ length: table.getPageCount() }).map((_, index) => (
+              <PaginationItem key={index}>
+                <PaginationLink
+                  onClick={() => table.setPageIndex(index)}
+                  isActive={table.getState().pagination.pageIndex === index}
+                  className="cursor-pointer"
+                >
+                  {index + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => {
+                  if (table.getCanNextPage()) {
+                    table.nextPage();
+                  }
+                }}
+                className={
+                  !table.getCanNextPage()
+                    ? "cursor-not-allowed opacity-50"
+                    : "cursor-pointer"
+                }
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       </div>
     </div>
   );

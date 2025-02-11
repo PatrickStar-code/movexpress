@@ -10,6 +10,7 @@ import { Faq } from "./_components/Faq";
 import { VideoPlayer } from "./_components/Video";
 import { Container } from "./_components/Container";
 import { auth } from "@/auth";
+import { Footer } from "./_components/Footer";
 
 export default async function ClientPage() {
   const session = await auth();
@@ -57,6 +58,7 @@ export default async function ClientPage() {
         </SectionTitle>
         <Faq />
         <Cta isLoged={isLogged} />
+        <Footer />
       </Container>
     </main>
   );
