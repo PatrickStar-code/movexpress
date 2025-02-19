@@ -84,11 +84,10 @@ model Entrega {
   numero_destino     Int
   bairro_destino     String
   logradouro_destino String
-  distancia_km       String
-  tempo_transporte   String
+  distancia_km       Int
   tempo_minutos      Int
   valor_total        Float
-  valor_70p          Float
+  valor_descontado          Float
   data_pedido        DateTime       @default(now())
   status_entrega     StatusEntrega  @default(PENDENTE)
   assinado_por       String?

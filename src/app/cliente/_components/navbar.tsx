@@ -9,6 +9,7 @@ import { usePathname } from "next/navigation";
 import { ScrollProgress } from "@/app/_components/ui/scroll-progress";
 import DialogLogin from "./DialogLogin";
 import ToggleAvatar from "./ToggleAvatar";
+import Image from "next/image";
 
 export type PropsUser = {
   expires: string;
@@ -23,7 +24,6 @@ export default function Navbar({ session }: { session: PropsUser }) {
   const [theme, setTheme] = useState("light");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathName = usePathname();
-  console.log(session);
 
   useEffect(() => {
     const prefersDark = window.matchMedia(
@@ -55,9 +55,22 @@ export default function Navbar({ session }: { session: PropsUser }) {
             >
               <Link
                 href="/cliente"
-                className="cursor-pointer text-xl font-bold text-gray-800 dark:text-gray-200"
+                className="cursor-pointer text-xl font-bold text-gray-800 flex gap-4 justify-center items-center dark:text-gray-200"
               >
-                Brand
+                <Image
+                  src="/img/logo_black.png"
+                  alt="MoveXpress"
+                  className="dark:hidden block"
+                  width={52}
+                  height={52}
+                />
+                <Image
+                  src="/img/logo_white.png"
+                  alt="MoveXpress"
+                  className="dark:block hidden"
+                  width={52}
+                  height={52}
+                />
               </Link>
             </motion.div>
 

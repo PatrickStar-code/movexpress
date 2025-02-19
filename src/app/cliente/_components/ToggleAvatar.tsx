@@ -59,7 +59,7 @@ export default function ToggleAvatar({ session }: { session: PropsUser }) {
                 <ClipboardList /> <span>Entregas</span>
               </DropdownMenuItem>
             </Link>
-            <DialogTrigger>
+            <DialogTrigger asChild>
               <DropdownMenuItem>
                 <Truck />
                 <span>Solicitar Entrega</span>

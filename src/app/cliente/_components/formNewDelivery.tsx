@@ -1,3 +1,5 @@
+"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,32 +14,92 @@ import {
   FaDollarSign,
   FaSpinner,
 } from "react-icons/fa";
+import calculateDeliveryValue from "../_actions/calculateDeliveryValue";
+import AddNewDelivery from "../_actions/addNewDelivery";
+
+export type TDataFormated = {
+  distancia_km: number;
+  valor_descontado?: number;
+  tempo_minutos: number;
+} & TDeliveryForm;
 
 // Esquema de validação
 const deliverySchema = z.object({
-  descricao: z.string().min(5, "A descrição deve ter pelo menos 5 caracteres"),
-  peso: z.number().positive("O peso deve ser um valor positivo"),
-  cep_origem: z.string().min(8, "CEP inválido").max(8, "CEP inválido"),
-  numero_origem: z.number().int("Deve ser um número inteiro"),
-  bairro_origem: z.string().optional(),
-  logradouro_origem: z.string().optional(),
-  cidade_origem: z.string().optional(),
-  uf_origem: z.string().optional(),
-  cep_destino: z.string().min(8, "CEP inválido").max(8, "CEP inválido"),
-  numero_destino: z.number().int("Deve ser um número inteiro"),
-  bairro_destino: z.string().min(2, "O bairro é obrigatório"),
-  logradouro_destino: z.string().min(2, "O logradouro é obrigatório"),
-  cidade_destino: z.string().optional(),
-  uf_destino: z.string().optional(),
-  valor_total: z.number().positive("O valor deve ser positivo"),
+  descricao: z
+    .string({ required_error: "A descrição é obrigatória" })
+    .min(5, "A descrição deve ter pelo menos 5 caracteres"),
+  peso: z
+    .number({
+      invalid_type_error: "O peso deve ser um número",
+      required_error: "O peso é obrigatório",
+    })
+    .positive("O peso deve ser um valor positivo")
+
+    .max(12, "O peso máximo é 12 kg"),
+  cep_origem: z
+    .string({ required_error: "O CEP é obrigatório" })
+    .max(8, "CEP inválido"),
+  numero_origem: z
+    .number({
+      invalid_type_error: "O numero da origem deve ser um número",
+      required_error: "O numero da origem é obrigatório",
+    })
+    .int("Deve ser um número inteiro"),
+  bairro_origem: z.string({ required_error: "O bairro é obrigatório" }),
+  logradouro_origem: z.string({ required_error: "O logradouro é obrigatório" }),
+  cidade_origem: z.string({ required_error: "A cidade é obrigatória" }),
+  uf_origem: z.string({ required_error: "A UF é obrigatória" }),
+  cep_destino: z
+    .string({ required_error: "O CEP é obrigatório" })
+    .max(8, "CEP inválido"),
+  numero_destino: z
+    .number({
+      invalid_type_error: "O numero do destino deve ser um número",
+      required_error: "O numero do destino é obrigatório",
+    })
+    .int("Deve ser um número inteiro"),
+  bairro_destino: z
+    .string({ required_error: "O bairro é obrigatório" })
+    .min(2, "O bairro é obrigatório"),
+  logradouro_destino: z.string({
+    required_error: "O logradouro é obrigatório",
+  }),
+  cidade_destino: z.string({
+    required_error: "A cidade é obrigatória",
+  }),
+  uf_destino: z.string({
+    required_error: "A UF é obrigatória",
+  }),
+  valor_total: z.number({
+    invalid_type_error: "Gere o valor total",
+    required_error: "O valor total é obrigatório",
+  }),
 });
 
-type TDeliveryForm = z.infer<typeof deliverySchema>;
+export type TDeliveryForm = z.infer<typeof deliverySchema>;
 
 export function DeliveryForm() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false); // Estado para o loading
   const isDark = document.documentElement.classList.contains("dark");
+  const [deliveryLoading, setDeliveryLoading] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [distance, setDistance] = useState(0);
+
+  const values = {
+    descricao: "",
+    cep_origem: "",
+    bairro_origem: "",
+    logradouro_origem: "",
+    cidade_origem: "",
+    uf_origem: "",
+    cep_destino: "",
+    bairro_destino: "",
+    logradouro_destino: "",
+    cidade_destino: "",
+    uf_destino: "",
+    valor_total: 0,
+  };
 
   const {
     register,
@@ -46,13 +108,16 @@ export function DeliveryForm() {
     setValue,
     trigger,
     watch,
+    reset,
   } = useForm<TDeliveryForm>({
     resolver: zodResolver(deliverySchema),
     mode: "onChange",
+    defaultValues: values,
   });
 
   const cepOrigem = watch("cep_origem");
   const cepDestino = watch("cep_destino");
+  const peso = watch("peso");
 
   useEffect(() => {
     if (cepOrigem && cepOrigem.length === 8) {
@@ -71,7 +136,13 @@ export function DeliveryForm() {
   const fetchAddress = async (cep: string, type: "origem" | "destino") => {
     setLoading(true); // Ativa o loading
     try {
+      // Limpa os campos
+      setValue(`bairro_${type}`, "");
+      setValue(`logradouro_${type}`, "");
+      setValue(`cidade_${type}`, "");
+      setValue(`uf_${type}`, "");
       const cepReplaced = cep.replace("-", "");
+
       const response = await fetch(
         `https://viacep.com.br/ws/${cepReplaced}/json/`
       );
@@ -94,11 +165,11 @@ export function DeliveryForm() {
       trigger(`logradouro_${type}`);
       trigger(`cidade_${type}`);
       trigger(`uf_${type}`);
-    } catch (error) {
-      toast.error("Erro ao buscar endereço", {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error: any) {
+      toast.error("Erro ao buscar rota entre endereços tente outra vez", {
         theme: isDark ? "dark" : "light",
       });
-      console.log(error);
     } finally {
       setLoading(false); // Desativa o loading
     }
@@ -109,16 +180,80 @@ export function DeliveryForm() {
   };
 
   const onSubmit = (data: TDeliveryForm) => {
-    console.log("Dados enviados:", data);
-    toast.success("Entrega cadastrada com sucesso!", {
-      theme: isDark ? "dark" : "light",
-    });
+    try {
+      const dataFormated = {
+        ...data,
+        distancia_km: distance,
+        tempo_minutos: duration,
+      };
+
+      AddNewDelivery(dataFormated);
+      toast.success("Entrega cadastrada com sucesso!", {
+        theme: isDark ? "dark" : "light",
+      });
+    } catch (error: any) {
+      toast.error(error.message, { theme: isDark ? "dark" : "light" });
+    } finally {
+      setStep(1);
+      reset();
+    }
   };
 
-  const fetchValorTotal = async () => {
-    const valorTotal = 150.75;
-    setValue("valor_total", valorTotal);
-    await trigger("valor_total");
+  // Use useEffect para realizar o cálculo quando distance ou duration mudarem
+  const calcularValorTotal = async () => {
+    try {
+      setDeliveryLoading(true); // Ativa o loading
+
+      // Busca a distância e a duração
+      const res = await fetch(
+        `/api/distancia?origem=${cepOrigem}&destino=${cepDestino}`
+      );
+      const data = await res.json();
+
+      const distanceText = data.rows[0].elements[0].distance.text;
+      const durationText = data.rows[0].elements[0].duration.text;
+
+      // Atualiza os valores de distância e duração
+      setDistance(parseFloat(distanceText));
+      setDuration(convertDurationToMinutes(durationText));
+
+      // Calcula o valor total
+      const total = await calculateDeliveryValue({
+        distancia: parseFloat(distanceText),
+        tempo_transporte: convertDurationToMinutes(durationText),
+        peso: peso,
+      });
+
+      setValue("valor_total", total); // Atualiza o valor total no formulário
+    } catch (error: any) {
+      toast.error(error.message, {
+        theme: isDark ? "dark" : "light",
+      });
+    } finally {
+      setDeliveryLoading(false); // Desativa o loading
+    }
+  };
+
+  // Função para converter duração no formato "X hours Y mins" para minutos
+  const convertDurationToMinutes = (durationText: string): number => {
+    // Divide a string em partes
+    const parts = durationText.split(" ");
+
+    let hours = 0;
+    let minutes = 0;
+
+    // Itera sobre as partes para extrair horas e minutos
+    for (let i = 0; i < parts.length; i++) {
+      if (parts[i] === "hours" || parts[i] === "hour") {
+        hours = parseFloat(parts[i - 1]); // Pega o valor antes de "hours" ou "hour"
+      }
+      if (parts[i] === "mins" || parts[i] === "min") {
+        minutes = parseFloat(parts[i - 1]); // Pega o valor antes de "mins" ou "min"
+      }
+    }
+
+    // Converte horas para minutos e soma com os minutos
+    return hours * 60 + minutes;
   };
 
   const handleNextStep = async () => {
@@ -139,11 +274,17 @@ export function DeliveryForm() {
 
     // Usando o operador de propagação para passar os campos como argumentos separados
     const isValid = await trigger(fieldsToValidate as (keyof TDeliveryForm)[]);
-    if (isValid) setStep((prev) => prev + 1);
-    else
+    if (isValid) {
+      if (step === 3) {
+        // Se estiver avançando para a quarta etapa, calcula o valor total
+        await calcularValorTotal();
+      }
+      setStep((prev) => prev + 1);
+    } else {
       toast.error("Preencha os campos obrigatórios.", {
         theme: isDark ? "dark" : "light",
       });
+    }
   };
 
   const handlePrevStep = () => setStep((prev) => prev - 1);
@@ -178,7 +319,7 @@ export function DeliveryForm() {
                 key={s}
                 className={`w-8 h-8 rounded-full flex items-center justify-center ${
                   step === s
-                    ? "bg-blue-500 text-white"
+                    ? "bg-orange-500 text-white"
                     : "bg-gray-200 text-gray-600"
                 }`}
               >
@@ -196,7 +337,10 @@ export function DeliveryForm() {
                 <Input
                   placeholder="Descrição"
                   {...register("descricao")}
-                  className="w-ful lg:w-[20rem] h-12 text-lg"
+                  className={`w-ful ${
+                    errors.descricao ? "border-red-500" : ""
+                  }  md:w-[20rem] lg:w-[20rem] h-12  text-lg`}
+                  required
                 />
                 {errors.descricao && (
                   <p className="text-red-500 text-sm">
@@ -205,10 +349,14 @@ export function DeliveryForm() {
                 )}
 
                 <Input
+                  required
                   type="number"
+                  min={0}
                   placeholder="Peso (kg)"
                   {...register("peso", { valueAsNumber: true })}
-                  className="w-ful lg:w-[20rem] h-12 text-lg"
+                  className={`w-ful md:w-[20rem] lg:w-[20rem] h-12 text-lg ${
+                    errors.peso ? "border-red-500" : ""
+                  }`}
                 />
                 {errors.peso && (
                   <p className="text-red-500 text-sm">{errors.peso.message}</p>
@@ -224,9 +372,12 @@ export function DeliveryForm() {
               </h2>
               <div className="space-y-4">
                 <Input
+                  required
                   placeholder="CEP Origem"
                   {...register("cep_origem")}
-                  className="w-ful lg:w-[20rem] h-12 text-lg"
+                  className={`${
+                    errors.cep_origem ? "border-red-500" : ""
+                  } w-ful lg:w-[20rem] md:w-[20rem] h-12 text-lg `}
                   onChange={(e) => {
                     const formattedCEP = formatCEP(e.target.value);
                     setValue("cep_origem", formattedCEP);
@@ -242,8 +393,11 @@ export function DeliveryForm() {
                 <Input
                   type="number"
                   placeholder="Número"
+                  required
                   {...register("numero_origem", { valueAsNumber: true })}
-                  className="w-full h-12 text-lg "
+                  className={`w-full h-12 text-lg md:w-[20rem] ${
+                    errors.numero_origem ? "border-red-500" : ""
+                  }`}
                 />
                 {errors.numero_origem && (
                   <p className="text-red-500 text-sm">
@@ -253,8 +407,11 @@ export function DeliveryForm() {
 
                 <Input
                   placeholder="Bairro"
+                  required
                   {...register("bairro_origem")}
-                  className="w-ful lg:w-[20rem] h-12 text-lg"
+                  className={`w-ful lg:w-[20rem] md:w-[20rem] h-12 text-lg ${
+                    errors.bairro_origem ? "border-red-500" : ""
+                  }`}
                   disabled
                 />
                 {errors.bairro_origem && (
@@ -265,8 +422,11 @@ export function DeliveryForm() {
 
                 <Input
                   placeholder="Logradouro"
+                  required
                   {...register("logradouro_origem")}
-                  className="w-ful lg:w-[20rem] h-12 text-lg"
+                  className={`w-ful lg:w-[20rem] h-12 text-lg md:w-[20rem] ${
+                    errors.logradouro_origem ? "border-red-500" : ""
+                  }`}
                   disabled
                 />
                 {errors.logradouro_origem && (
@@ -277,6 +437,7 @@ export function DeliveryForm() {
 
                 <Input
                   placeholder="Cidade"
+                  required
                   {...register("cidade_origem")}
                   className="w-ful lg:w-[20rem] h-12 text-lg"
                   disabled
@@ -289,8 +450,11 @@ export function DeliveryForm() {
 
                 <Input
                   placeholder="UF"
+                  required
                   {...register("uf_origem")}
-                  className="w-ful lg:w-[20rem] h-12 text-lg"
+                  className={`w-ful lg:w-[20rem] md:w-[20rem] h-12 text-lg ${
+                    errors.uf_origem ? "border-red-500" : ""
+                  } `}
                   disabled
                 />
                 {errors.uf_origem && (
@@ -301,6 +465,7 @@ export function DeliveryForm() {
 
                 {loading && (
                   <div className="flex justify-center">
+                    Carregando dados do cep ...{" "}
                     <FaSpinner className="animate-spin" />
                   </div>
                 )}
@@ -315,14 +480,17 @@ export function DeliveryForm() {
               </h2>
               <div className="space-y-4">
                 <Input
+                  required
                   placeholder="CEP Destino"
                   {...register("cep_destino")}
-                  className="w-ful lg:w-[20rem] h-12 text-lg"
+                  className={`w-ful lg:w-[20rem] h-12 text-lg md:w-[20rem] ${
+                    errors.cep_destino ? "border-red-500" : ""
+                  }`}
                   onChange={(e) => {
                     const formattedCEP = formatCEP(e.target.value);
                     setValue("cep_destino", formattedCEP);
                   }}
-                  maxLength={8} // Limita o input a 8 caracteres
+                  maxLength={8}
                 />
                 {errors.cep_destino && (
                   <p className="text-red-500 text-sm">
@@ -333,8 +501,11 @@ export function DeliveryForm() {
                 <Input
                   type="number"
                   placeholder="Número"
+                  required
                   {...register("numero_destino", { valueAsNumber: true })}
-                  className="w-ful lg:w-[20rem] h-12 text-lg"
+                  className={`w-ful lg:w-[20rem] h-12 text-lg md:w-[20rem] ${
+                    errors.numero_destino ? "border-red-500" : ""
+                  }`}
                 />
                 {errors.numero_destino && (
                   <p className="text-red-500 text-sm">
@@ -345,7 +516,11 @@ export function DeliveryForm() {
                 <Input
                   placeholder="Bairro"
                   {...register("bairro_destino")}
-                  className="w-ful lg:w-[20rem] h-12 text-lg"
+                  required
+                  className={`w-ful lg:w-[20rem] h-12 text-lg md:w-[20rem] ${
+                    errors.bairro_destino ? "border-red-500" : ""
+                  }`}
+                  disabled
                 />
                 {errors.bairro_destino && (
                   <p className="text-red-500 text-sm">
@@ -356,7 +531,11 @@ export function DeliveryForm() {
                 <Input
                   placeholder="Logradouro"
                   {...register("logradouro_destino")}
-                  className="w-ful lg:w-[20rem] h-12 text-lg"
+                  required
+                  className={`w-ful lg:w-[20rem] h-12 text-lg md:w-[20rem] ${
+                    errors.logradouro_destino ? "border-red-500" : ""
+                  }`}
+                  disabled
                 />
                 {errors.logradouro_destino && (
                   <p className="text-red-500 text-sm">
@@ -367,7 +546,10 @@ export function DeliveryForm() {
                 <Input
                   placeholder="Cidade"
                   {...register("cidade_destino")}
-                  className="w-ful lg:w-[20rem] h-12 text-lg"
+                  required
+                  className={`w-ful lg:w-[20rem] h-12 text-lg md:w-[20rem] ${
+                    errors.cidade_destino ? "border-red-500" : ""
+                  } `}
                   disabled
                 />
                 {errors.cidade_destino && (
@@ -379,7 +561,10 @@ export function DeliveryForm() {
                 <Input
                   placeholder="UF"
                   {...register("uf_destino")}
-                  className="w-ful lg:w-[20rem] h-12 text-lg"
+                  required
+                  className={`w-ful lg:w-[20rem] h-12 text-lg md:w-[20rem] ${
+                    errors.uf_destino ? "border-red-500" : ""
+                  }`}
                   disabled
                 />
                 {errors.uf_destino && (
@@ -390,6 +575,7 @@ export function DeliveryForm() {
 
                 {loading && (
                   <div className="flex justify-center">
+                    Carregando dados do cep ...{" "}
                     <FaSpinner className="animate-spin" />
                   </div>
                 )}
@@ -403,16 +589,24 @@ export function DeliveryForm() {
                 <FaDollarSign /> Valor Total
               </h2>
               <div className="flex items-center gap-4">
-                <Input
-                  type="number"
-                  placeholder="Valor Total (R$)"
-                  {...register("valor_total", { valueAsNumber: true })}
-                  disabled
-                  className="w-ful lg:w-[20rem] h-12 text-lg"
-                />
-                <Button type="button" onClick={fetchValorTotal}>
-                  Calcular
-                </Button>
+                {deliveryLoading ? (
+                  <div className="flex justify-center">
+                    Calculando valor total...{" "}
+                    <FaSpinner className="animate-spin" />
+                  </div>
+                ) : (
+                  <Input
+                    type="number"
+                    placeholder="Valor Total (R$)"
+                    required
+                    {...register("valor_total", { valueAsNumber: true })}
+                    disabled
+                    className={`w-ful lg:w-[20rem] h-12 text-lg md:w-[20rem] ${
+                      errors.valor_total ? "border-red-500" : ""
+                    }`}
+                    defaultValue={0}
+                  />
+                )}
               </div>
               {errors.valor_total && (
                 <p className="text-red-500 text-sm">
@@ -434,10 +628,18 @@ export function DeliveryForm() {
                 onClick={handleNextStep}
                 disabled={!isStepValid()}
               >
-                Próximo
+                {deliveryLoading
+                  ? "Calculando total" + <FaSpinner className="animate-spin" />
+                  : "Próximo"}
               </Button>
             ) : (
-              <Button type="submit">Finalizar</Button>
+              <Button
+                type="submit"
+                className="disabled:cursor-not-allowed"
+                disabled={deliveryLoading}
+              >
+                Finalizar
+              </Button>
             )}
           </div>
         </form>
