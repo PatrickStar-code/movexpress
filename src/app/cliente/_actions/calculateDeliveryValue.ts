@@ -16,7 +16,6 @@ interface CalculateDeliveryValueParams {
  */
 export default async function calculateDeliveryValue({ distancia, tempo_transporte, peso }: CalculateDeliveryValueParams): Promise<number> {
 
-    console.log(distancia, tempo_transporte, peso);
 
     if (distancia <= 0 || distancia === null || tempo_transporte <= 0 || tempo_transporte === null) {
         throw new Error("Distância, tempo de transporte ou peso inválidos.");
@@ -60,7 +59,6 @@ export default async function calculateDeliveryValue({ distancia, tempo_transpor
                 }
             })
         ]);
-        console.log("Valores encontrados:", { valorDistancia, valorTempo, valorPeso });
 
         // Cálculo do valor total
         if (!valorDistancia || !valorTempo || !valorPeso) {

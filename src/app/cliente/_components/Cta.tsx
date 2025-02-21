@@ -3,6 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Container } from "./Container";
 import Link from "next/link";
+import DialogNewDelivery from "./DialogNewDelivery";
 
 export const Cta = ({ isLoged }: { isLoged: boolean }) => {
   return (
@@ -24,9 +25,11 @@ export const Cta = ({ isLoged }: { isLoged: boolean }) => {
         </div>
         <div className="flex-shrink-0 w-full text-center lg:w-auto">
           {isLoged ? (
-            <button className="inline-block py-3 mx-auto text-lg font-medium text-center text-orange-600 bg-white rounded-md px-7 lg:px-10 lg:py-5">
-              Solicitar Entrega
-            </button>
+            <DialogNewDelivery>
+              <button className="inline-block py-3 mx-auto text-lg font-medium text-center text-orange-600 bg-white rounded-md px-7 lg:px-10 lg:py-5">
+                Solicitar Entrega
+              </button>
+            </DialogNewDelivery>
           ) : (
             <Link
               href="cliente/cadastro"

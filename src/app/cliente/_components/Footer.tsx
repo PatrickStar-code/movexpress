@@ -14,14 +14,21 @@ export function Footer() {
             <div>
               <Link
                 href="/"
-                className="flex items-center space-x-2 text-2xl font-medium text-orange-500 dark:text-gray-100"
+                className="flex items-center space-x-2 text-2xl font-medium text-orange-500 "
               >
                 <Image
-                  src="/img"
+                  src="/img/logo_white.png"
                   alt="MoveXpress"
                   width="32"
                   height="32"
-                  className="w-8"
+                  className="w-8 dark:block hidden"
+                />
+                <Image
+                  src="/img/logo_black.png"
+                  alt="MoveXpress"
+                  width="32"
+                  height="32"
+                  className="w-8 dark:hidden block"
                 />
                 <span>MoveXpress</span>
               </Link>
@@ -61,7 +68,9 @@ export function Footer() {
             </div>
           </div>
           <div>
-            <div>Siga-nos</div>
+            <div className="text-base font-medium text-gray-800 dark:text-gray-200">
+              Siga-nos
+            </div>
             <div className="flex mt-5 space-x-5 text-gray-400 dark:text-gray-500">
               <a href="#" target="_blank" rel="noopener">
                 <span className="sr-only">Twitter</span>

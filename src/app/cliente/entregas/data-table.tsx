@@ -12,6 +12,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { HTMLAttributes } from "react";
+import { ToastContentProps } from "react-toastify";
+
 import {
   ArrowDownNarrowWide,
   ArrowUpNarrowWide,
@@ -48,33 +51,12 @@ import {
   TableRow,
 } from "@/app/_components/ui/table";
 import { Badge } from "@/app/_components/ui/badge"; // Importando o Badge do ShadCN
-
-const data: Entrega[] = [
-  {
-    id: 1,
-    descricao: "Entrega de móveis",
-    peso: 25.5,
-    cep_origem: "12345-678",
-    numero_origem: 100,
-    bairro_origem: "Centro",
-    logradouro_origem: "Rua A",
-    cep_destino: "87654-321",
-    numero_destino: 200,
-    bairro_destino: "Bairro B",
-    logradouro_destino: "Rua B",
-    distancia_km: "15",
-    tempo_transporte: "30 minutos",
-    tempo_minutos: 30,
-    valor_total: 100.5,
-    valor_70p: 70.35,
-    data_pedido: new Date(),
-    status_entrega: "PENDENTE",
-    assinado_por: "João Silva",
-    hora_inicio: new Date(),
-    hora_prevista: new Date(),
-  },
-  // outros dados de entrega...
-];
+import UseConvertMinutesToHours from "@/app/_hooks/useConvertMinutesToHours";
+import { toast } from "react-toastify";
+import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
+import { EntregaDetails } from "../_components/entregaDetails";
+import DeleteDelivery from "../_actions/deleteDelivery";
+import ConfirmationToast from "../_components/toastDelete";
 
 export type Entrega = {
   id: number;
@@ -82,23 +64,56 @@ export type Entrega = {
   peso: number;
   cep_origem: string;
   numero_origem: number;
-  bairro_origem: string;
-  logradouro_origem: string;
+  bairro_origem?: string | null;
+  logradouro_origem?: string | null;
   cep_destino: string;
   numero_destino: number;
-  bairro_destino: string;
-  logradouro_destino: string;
-  distancia_km: string;
-  tempo_transporte: string;
-  tempo_minutos: number;
-  valor_total: number;
-  valor_70p: number;
-  data_pedido: Date;
-  status_entrega: "PENDENTE" | "EM ROTA" | "CONCLUÍDA";
-  assinado_por: string | null;
-  hora_inicio: Date | null;
-  hora_prevista: Date | null;
+  bairro_destino?: string | null;
+  logradouro_destino?: string | null;
+  distancia_km: number; // Ajustado para number, se necessário
+  tempo_minutos?: number;
+  valor_total?: number;
+  valor_transporte?: number;
+  data_pedido?: Date;
+  status_entrega?:
+    | "PENDENTE"
+    | "EM ROTA"
+    | "CONCLUÍDA"
+    | "ACEITO"
+    | "ENVIADO"
+    | "ENTREGUE";
+  assinado_por?: string | null;
+  hora_inicio?: Date | null;
+  hora_prevista?: Date | null;
 };
+
+export function clipboardCopy(text: string) {
+  navigator.clipboard.writeText(text);
+  toast.success("Texto copiado para a área de transferência!", {
+    theme: document.documentElement.classList.contains("dark")
+      ? "dark"
+      : "light",
+  });
+}
+
+export async function handleDelete(id: number) {
+  try {
+    await DeleteDelivery({ id });
+    toast.dismiss();
+    toast.success("Entrega deletada com sucesso!", {
+      theme: document.documentElement.classList.contains("dark")
+        ? "dark"
+        : "light",
+    });
+  } catch (e) {
+    console.error(e);
+    toast.error("Erro ao deletar entrega", {
+      theme: document.documentElement.classList.contains("dark")
+        ? "dark"
+        : "light",
+    });
+  }
+}
 
 export const columns: ColumnDef<Entrega>[] = [
   {
@@ -158,9 +173,14 @@ export const columns: ColumnDef<Entrega>[] = [
     cell: ({ row }) => <div>{row.getValue("distancia_km")} km</div>,
   },
   {
-    accessorKey: "tempo_transporte",
+    accessorKey: "tempo_minutos",
     header: "Tempo de Transporte",
-    cell: ({ row }) => <div>{row.getValue("tempo_transporte")}</div>,
+    cell: ({ row }) => {
+      const tempoTransporte = row.getValue("tempo_minutos") as number; // Supondo que o tempo de transporte seja um número
+      const tempoFormatado = UseConvertMinutesToHours(tempoTransporte); // Usando o hook para formatar o tempo
+
+      return <div>{tempoFormatado}</div>;
+    },
   },
   {
     id: "acoes",
@@ -169,33 +189,60 @@ export const columns: ColumnDef<Entrega>[] = [
       const entrega = row.original;
       return (
         <div className="flex justify-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Abrir menu</span>
-                <MoreHorizontal />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Ações</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() =>
-                  navigator.clipboard.writeText(entrega.id.toString())
-                }
-              >
-                Copiar ID da Entrega
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Dialog>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Abrir menu</span>
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => clipboardCopy(entrega.id.toString())}
+                >
+                  Copiar ID da Entrega
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DialogTrigger asChild onClick={() => {}}>
+                  <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
+                </DialogTrigger>
+                <DropdownMenuItem
+                  onClick={() =>
+                    toast(
+                      <ConfirmationToast
+                        onConfirm={() => handleDelete(entrega.id)}
+                        onCancel={() => toast.dismiss()}
+                        message={`Tem certeza que deseja excluir a entrega ${entrega.id}? Esta operação é irreversível.`}
+                      />,
+                      {
+                        autoClose: false, // Desabilita o fechamento automático
+                        closeButton: false, // Remove o botão de fechar padrão
+                        theme: document.documentElement.classList.contains(
+                          "dark"
+                        )
+                          ? "dark"
+                          : "light",
+                        closeOnClick: false, // Impede que o toast feche ao clicar fora
+                      }
+                    )
+                  }
+                  className="text-red-600"
+                >
+                  Excluir
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <EntregaDetails entrega={entrega} />
+          </Dialog>
         </div>
       );
     },
   },
 ];
 
-export function DataTableDemo() {
+export function DataTableDemo({ data }: { data: Entrega[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -203,7 +250,6 @@ export function DataTableDemo() {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-
   const table = useReactTable({
     data,
     columns,
@@ -365,6 +411,91 @@ export function DataTableDemo() {
           </PaginationContent>
         </Pagination>
       </div>
+    </div>
+  );
+}
+
+export default function DeleteToast({
+  closeToast,
+  toastProps,
+  data,
+}: ToastContentProps<{ message: string; onConfirm: () => void }>) {
+  const strokeDash = 565.48;
+  const attributes: HTMLAttributes<SVGCircleElement> = {};
+
+  // Handle controlled progress bar
+  if (typeof toastProps.progress === "number") {
+    attributes.style = {
+      transition: "all .1s linear",
+      strokeDashoffset: `${strokeDash - strokeDash * toastProps.progress}px`,
+    };
+  }
+
+  const handleConfirm = () => {
+    data.onConfirm(); // Executa a função de confirmação
+    closeToast(); // Fecha o toast
+  };
+
+  const handleCancel = () => {
+    closeToast(); // Fecha o toast sem fazer nada
+  };
+
+  return (
+    <div className="flex flex-col gap-4 w-full">
+      {/* Mensagem de confirmação */}
+      <p className="text-sm">{data.message}</p>
+
+      {/* Botões de ação */}
+      <div className="flex gap-2 justify-end">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleCancel}
+          className="dark:bg-gray-800 dark:text-white"
+        >
+          Cancelar
+        </Button>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={handleConfirm}
+          className="dark:bg-red-600 dark:text-white"
+        >
+          Confirmar
+        </Button>
+      </div>
+
+      {/* Barra de progresso (opcional) */}
+      <svg
+        width="40"
+        height="40"
+        viewBox="-25 -25 250 250"
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        className="-rotate-90"
+      >
+        <circle
+          r="90"
+          cx="100"
+          cy="100"
+          fill="transparent"
+          stroke="#e0e0e0"
+          strokeWidth="6"
+          strokeDasharray={`${strokeDash}px`}
+          strokeDashoffset="0"
+        />
+        <circle
+          r="90"
+          cx="100"
+          cy="100"
+          stroke="#76e5b1"
+          strokeWidth="16px"
+          strokeLinecap="round"
+          fill="transparent"
+          strokeDasharray={`${strokeDash}px`}
+          {...attributes}
+        />
+      </svg>
     </div>
   );
 }

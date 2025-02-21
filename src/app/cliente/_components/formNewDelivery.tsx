@@ -83,6 +83,7 @@ export function DeliveryForm() {
   const [loading, setLoading] = useState(false); // Estado para o loading
   const isDark = document.documentElement.classList.contains("dark");
   const [deliveryLoading, setDeliveryLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
   const [duration, setDuration] = useState(0);
   const [distance, setDistance] = useState(0);
 
@@ -181,6 +182,7 @@ export function DeliveryForm() {
 
   const onSubmit = (data: TDeliveryForm) => {
     try {
+      setFormLoading(true);
       const dataFormated = {
         ...data,
         distancia_km: distance,
@@ -196,6 +198,7 @@ export function DeliveryForm() {
     } finally {
       setStep(1);
       reset();
+      setFormLoading(false);
     }
   };
 
@@ -628,17 +631,27 @@ export function DeliveryForm() {
                 onClick={handleNextStep}
                 disabled={!isStepValid()}
               >
-                {deliveryLoading
-                  ? "Calculando total" + <FaSpinner className="animate-spin" />
-                  : "Próximo"}
+                {deliveryLoading ? (
+                  <>
+                    Calculando total <FaSpinner className="animate-spin" />
+                  </>
+                ) : (
+                  "Próximo"
+                )}
               </Button>
             ) : (
               <Button
                 type="submit"
                 className="disabled:cursor-not-allowed"
-                disabled={deliveryLoading}
+                disabled={formLoading}
               >
-                Finalizar
+                {formLoading ? (
+                  <>
+                    Enviando dados <FaSpinner className="animate-spin" />
+                  </>
+                ) : (
+                  "Enviar"
+                )}
               </Button>
             )}
           </div>
