@@ -208,30 +208,32 @@ export const columns: ColumnDef<Entrega>[] = [
                 <DialogTrigger asChild onClick={() => {}}>
                   <DropdownMenuItem>Ver detalhes</DropdownMenuItem>
                 </DialogTrigger>
-                <DropdownMenuItem
-                  onClick={() =>
-                    toast(
-                      <ConfirmationToast
-                        onConfirm={() => handleDelete(entrega.id)}
-                        onCancel={() => toast.dismiss()}
-                        message={`Tem certeza que deseja excluir a entrega ${entrega.id}? Esta operação é irreversível.`}
-                      />,
-                      {
-                        autoClose: false, // Desabilita o fechamento automático
-                        closeButton: false, // Remove o botão de fechar padrão
-                        theme: document.documentElement.classList.contains(
-                          "dark"
-                        )
-                          ? "dark"
-                          : "light",
-                        closeOnClick: false, // Impede que o toast feche ao clicar fora
-                      }
-                    )
-                  }
-                  className="text-red-600"
-                >
-                  Excluir
-                </DropdownMenuItem>
+                {entrega.status_entrega === "PENDENTE" && (
+                  <DropdownMenuItem
+                    onClick={() =>
+                      toast(
+                        <ConfirmationToast
+                          onConfirm={() => handleDelete(entrega.id)}
+                          onCancel={() => toast.dismiss()}
+                          message={`Tem certeza que deseja excluir a entrega ${entrega.id}? Esta operação é irreversível.`}
+                        />,
+                        {
+                          autoClose: false, // Desabilita o fechamento automático
+                          closeButton: false, // Remove o botão de fechar padrão
+                          theme: document.documentElement.classList.contains(
+                            "dark"
+                          )
+                            ? "dark"
+                            : "light",
+                          closeOnClick: false, // Impede que o toast feche ao clicar fora
+                        }
+                      )
+                    }
+                    className="text-red-600"
+                  >
+                    Excluir
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
             <EntregaDetails entrega={entrega} />

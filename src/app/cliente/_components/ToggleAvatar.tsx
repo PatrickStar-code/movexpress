@@ -54,6 +54,11 @@ export default function ToggleAvatar({ session }: { session: PropsUser }) {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
+            <Link href="/cliente/perfil">
+              <DropdownMenuItem>
+                <User /> <span>Perfil</span>
+              </DropdownMenuItem>
+            </Link>
             <Link href="/cliente/entregas">
               <DropdownMenuItem>
                 <ClipboardList /> <span>Entregas</span>
@@ -65,10 +70,7 @@ export default function ToggleAvatar({ session }: { session: PropsUser }) {
                 <span>Solicitar Entrega</span>
               </DropdownMenuItem>
             </DialogTrigger>
-            <DropdownMenuItem>
-              <User />
-              <span>Perfil</span>
-            </DropdownMenuItem>
+
             <DropdownMenuItem>
               <CreditCard />
               <span>Formas De Pagamento</span>

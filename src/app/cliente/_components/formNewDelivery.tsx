@@ -86,6 +86,7 @@ export function DeliveryForm() {
   const [formLoading, setFormLoading] = useState(false);
   const [duration, setDuration] = useState(0);
   const [distance, setDistance] = useState(0);
+  const [containsError, setContainsError] = useState(false);
 
   const values = {
     descricao: "",
@@ -148,7 +149,6 @@ export function DeliveryForm() {
         `https://viacep.com.br/ws/${cepReplaced}/json/`
       );
       const data = await response.json();
-      console.log(data);
 
       if (data.erro) {
         toast.error("CEP não encontrado", { theme: isDark ? "dark" : "light" });
@@ -202,9 +202,11 @@ export function DeliveryForm() {
     }
   };
 
+  console.log(containsError);
   // Use useEffect para realizar o cálculo quando distance ou duration mudarem
   const calcularValorTotal = async () => {
     try {
+      setContainsError(false);
       setDeliveryLoading(true); // Ativa o loading
 
       // Busca a distância e a duração
@@ -232,8 +234,9 @@ export function DeliveryForm() {
       toast.error(error.message, {
         theme: isDark ? "dark" : "light",
       });
+      setContainsError(true);
     } finally {
-      setDeliveryLoading(false); // Desativa o loading
+      setDeliveryLoading(false);
     }
   };
 
@@ -279,10 +282,10 @@ export function DeliveryForm() {
     const isValid = await trigger(fieldsToValidate as (keyof TDeliveryForm)[]);
     if (isValid) {
       if (step === 3) {
-        // Se estiver avançando para a quarta etapa, calcula o valor total
         await calcularValorTotal();
+      } else if (!containsError) {
+        setStep((prev) => prev + 1);
       }
-      setStep((prev) => prev + 1);
     } else {
       toast.error("Preencha os campos obrigatórios.", {
         theme: isDark ? "dark" : "light",
@@ -629,7 +632,7 @@ export function DeliveryForm() {
               <Button
                 type="button"
                 onClick={handleNextStep}
-                disabled={!isStepValid()}
+                disabled={!isStepValid() || formLoading}
               >
                 {deliveryLoading ? (
                   <>

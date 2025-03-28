@@ -36,7 +36,7 @@ export const Testimonials = () => {
           className="lg:col-span-2 xl:col-auto"
           variants={containerVariants}
         >
-          <div className="flex flex-col justify-between w-full h-full bg-gray-100 px-14 rounded-2xl py-14 dark:bg-trueGray-800">
+          <div className="flex flex-col justify-between w-full h-full bg-gray-100 px-14 rounded-2xl py-14 dark:bg-gray-800">
             <p className="text-2xl leading-normal">
               A MoveXpress tem sido a solução ideal para nossas entregas! A
               rapidez e a segurança do serviço são excepcionais. A facilidade de
@@ -52,7 +52,7 @@ export const Testimonials = () => {
         </motion.div>
 
         <motion.div className="" variants={containerVariants}>
-          <div className="flex flex-col justify-between w-full h-full bg-gray-100 px-14 rounded-2xl py-14 dark:bg-trueGray-800">
+          <div className="flex flex-col justify-between w-full h-full bg-gray-100 px-14 rounded-2xl py-14 dark:bg-gray-800">
             <p className="text-2xl leading-normal">
               &quot;Com a MoveXpress, encontrei a solução perfeita para realizar
               entregas rápidas e seguras. O processo é simples e transparente.
@@ -68,7 +68,7 @@ export const Testimonials = () => {
         </motion.div>
 
         <motion.div className="" variants={containerVariants}>
-          <div className="flex flex-col justify-between w-full h-full bg-gray-100 px-14 rounded-2xl py-14 dark:bg-trueGray-800">
+          <div className="flex flex-col justify-between w-full h-full bg-gray-100 px-14 rounded-2xl py-14 dark:bg-gray-800">
             <p className="text-2xl leading-normal">
               &quot;Eu sou muito grato pelo serviço da MoveXpress! A plataforma
               é fácil de usar, e os entregadores são sempre rápidos e
